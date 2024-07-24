@@ -1,4 +1,3 @@
-import dayjs from 'dayjs';
 import Link from 'next/link';
 import React from 'react';
 
@@ -12,40 +11,23 @@ async function page() {
     },
   });
 
-  const html = await response.text();
   const tmaxServerTime = response.headers.get('Date');
-  const vercelServerTime = dayjs().format('YYYY-MM-DD hh:MM:ss A');
-  const isSuccessful = response.ok && html.length > 2000;
-
-  const userData = html
-    .split('<table>')[1]
-    .split('</table>')[0]
-    .split('</td>')
-    .map((item) => {
-      const match = item.match(/<td[^>]*>(.*)/);
-      return match ? match[1].trim() : '';
-    });
-
+  const vercelServerTime = new Date().toLocaleString();
+  const isSuccessful = response.ok && (await response.text()).length > 2000;
   return (
     <div>
       <h1 className={`${isSuccessful ? 'text-green-600' : 'text-red-600'} font-bold text-2xl`}>
         {isSuccessful ? 'SUCCESS' : 'FAIL'}
       </h1>
-
-      <div className='flex justify-between'>
-        {userData.map((item, index) => (
-          <div key={index}>{item}</div>
-        ))}
-      </div>
       <div className='flex gap-4'>
         <h2>TMAX SERVER</h2>
-        {tmaxServerTime && <span>{dayjs(tmaxServerTime).format('YYYY-MM-DD hh:MM:ss A')}</span>}
+        <span>{tmaxServerTime}</span>
       </div>
       <div className={'flex gap-4'}>
         <h2>VERCEL SERVER</h2>
         <span>{vercelServerTime}</span>
       </div>
-      <Link href={'/detail'} className='text-blue-500 underline text-lg'>
+      <Link href={'/tmax/detail'} className='text-blue-500 underline text-lg'>
         See Detail
       </Link>
     </div>
